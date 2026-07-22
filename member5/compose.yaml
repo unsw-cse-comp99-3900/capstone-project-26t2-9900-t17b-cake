@@ -1,0 +1,13 @@
+services:
+  demo-b-results:
+    build: .
+    ports:
+      - "8765:8765"
+    environment:
+      RUN_ANALYSIS: "1"
+      DATA_ROOT: "/data/ET acc testing data"
+    volumes:
+      - "../input_data:/data:ro"
+      - "./results:/app/results"
+
+
