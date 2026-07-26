@@ -1,0 +1,110 @@
+{
+  "analysis_priority": "client meeting first; user full-grid idea as secondary sensitivity analysis",
+  "source_data_root": "C:\\Users\\Lenovo\\Desktop\\demo B\\climb_meeting_20260717_final\\input_data\\ET acc testing data",
+  "source_sessions": 39,
+  "selected_delay_s": 0.05,
+  "client_candidates_s": [
+    0.05,
+    0.1,
+    0.15
+  ],
+  "extended_delays_s": [
+    0.0,
+    0.01,
+    0.02,
+    0.03,
+    0.04,
+    0.05,
+    0.06,
+    0.07,
+    0.08,
+    0.09,
+    0.1,
+    0.11,
+    0.12,
+    0.13,
+    0.14,
+    0.15,
+    0.16,
+    0.17,
+    0.18,
+    0.19,
+    0.2
+  ],
+  "openet2_reference_settle_time_s": 0.6,
+  "openet2_reference_role": "visual/statistical reference only; not a Demo B candidate",
+  "coverage": 0.95,
+  "ellipse_rows": 341,
+  "figure_count": 149,
+  "target_sequence": [
+    7,
+    2,
+    1,
+    5,
+    9,
+    3,
+    4,
+    6,
+    8,
+    7,
+    8,
+    2,
+    5,
+    6,
+    4,
+    3,
+    9,
+    1,
+    6,
+    2,
+    1,
+    4,
+    5,
+    8,
+    9,
+    3,
+    7
+  ],
+  "target_mapping_normalised": {
+    "1": [
+      0.15,
+      0.15
+    ],
+    "2": [
+      0.85,
+      0.15
+    ],
+    "3": [
+      0.33,
+      0.33
+    ],
+    "4": [
+      0.66,
+      0.33
+    ],
+    "5": [
+      0.5,
+      0.5
+    ],
+    "6": [
+      0.33,
+      0.66
+    ],
+    "7": [
+      0.66,
+      0.66
+    ],
+    "8": [
+      0.15,
+      0.85
+    ],
+    "9": [
+      0.85,
+      0.85
+    ]
+  },
+  "assumed_field_of_view_deg": {
+    "x": 60.0,
+    "y": 33.75
+  }
+}

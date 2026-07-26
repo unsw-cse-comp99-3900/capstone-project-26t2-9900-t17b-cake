@@ -1,0 +1,40 @@
+date,run_id,subject_id,condition,metadata_source,marker_rows,usable_marker_rows,valid_gaze_samples_in_windows,calibration_avg_error,calibration_valid_points
+2025_04_11,000,CL98,Calib & Acc,Recording_info.csv,27,27,755,55.53,5
+2025_04_11,001,CL98,Acc 10min,Recording_info.csv,27,27,144,,
+2025_04_11,003,LW03,Calib & Acc,Recording_info.csv,27,27,2323,22.67,5
+2025_04_11,004,LW03,Acc 10min,Recording_info.csv,27,27,2581,,
+2025_04_11,005,JL98,Calib & Acc,Recording_info.csv,27,27,1629,139.77,5
+2025_04_11,006,JL98,Acc 10min,Recording_info.csv,27,27,1629,,
+2025_04_11,007,CL98,Acc 60min,inferred_missing_recording_info,27,27,1722,,
+2025_04_11,008,LW03,Acc 60min,Recording_info.csv,27,27,1776,,
+2025_04_11,009,PW78,Calib & Acc,Recording_info.csv,27,27,2314,34.80,5
+2025_04_11,010,PW78,Acc 10min,Recording_info.csv,27,27,2211,,
+2025_04_11,011,JL98,Acc 60min,Recording_info.csv,27,27,992,,
+2025_04_11,012,PW78,Acc 60min,Recording_info.csv,27,27,2404,,
+2025_04_12,001,CL98test,Calib & Acc,Recording_info.csv,27,27,2316,28.64,5
+2025_04_12,002,MQ85,Calib & Acc,Recording_info.csv,27,27,2114,10.48,5
+2025_04_12,003,MQ85,Acc 10min,Recording_info.csv,27,27,1275,,
+2025_04_12,004,NM84,Calib & Acc,Recording_info.csv,27,27,2211,15.84,5
+2025_04_12,005,QZ00,Calib & Acc,Recording_info.csv,27,27,1821,50.96,5
+2025_04_12,008,NM84,Acc 10min,Recording_info.csv,27,27,1817,,
+2025_04_12,011,MQ85,Acc 60min,Recording_info.csv,27,27,1754,,
+2025_04_12,012,QZ00,Acc 10min,Recording_info.csv,27,27,2351,,
+2025_04_12,013,SY91,Calib & Acc,Recording_info.csv,27,27,2362,1477.47,3
+2025_04_12,014,QZ00,Acc 60min,Recording_info.csv,27,27,2491,,
+2025_04_12,015,YR00,Calib & Acc,Recording_info.csv,27,27,1469,31.99,5
+2025_04_12,016,NM84,Acc 60min,Recording_info.csv,27,27,1798,,
+2025_04_12,017,SS73,Calib & Acc,Recording_info.csv,27,27,2498,21.04,5
+2025_04_12,018,YR00,Acc 10min,Recording_info.csv,27,27,2285,,
+2025_04_12,019,SS73,Acc 10min,Recording_info.csv,27,27,2232,,
+2025_04_12,020,RB76,Calib & Acc,Recording_info.csv,27,27,2367,27.96,5
+2025_04_12,021,SY91,Acc 10min,Recording_info.csv,27,27,1865,,
+2025_04_12,022,SY91,Acc 60min,Recording_info.csv,27,27,1635,,
+2025_04_12,023,YR00,Acc 60min,Recording_info.csv,27,27,2068,,
+2025_04_12,024,RB76,Acc 10min,Recording_info.csv,27,27,2329,,
+2025_04_12,025,AW75,Calib & Acc,Recording_info.csv,27,27,1738,85.09,5
+2025_04_12,026,JH71,Calib & Acc,Recording_info.csv,27,27,2372,16.06,5
+2025_04_12,027,SS73,Acc 60min,Recording_info.csv,27,27,1838,,
+2025_04_12,028,JH71,Acc 10min,Recording_info.csv,27,27,2442,,
+2025_04_12,030,AW75,Acc 10min,Recording_info.csv,27,27,2334,,
+2025_04_12,031,AW75,Acc 60min,Recording_info.csv,27,27,2266,,
+2025_04_12,032,JH71,Acc 60min,Recording_info.csv,27,27,2461,,
