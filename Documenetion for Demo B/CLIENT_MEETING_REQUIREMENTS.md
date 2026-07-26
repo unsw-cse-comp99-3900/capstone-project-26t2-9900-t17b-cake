@@ -1,0 +1,15 @@
+# Client Meeting Requirements Review (2026.07.13)
+
+| Client Requirement                                           | Implementation                                               |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Keep marker sizes the same and distinguish recordings using shapes such as circles/stars | Equal-area markers; dates represented with hollow circles/stars |
+| Explain the 95% ellipse/coverage                             | Empirical 95% QA reported separately and not included in the delay score |
+| Add onset compensation; try 50/100/150 ms                    | The three candidates are PRIMARY; 0–200 ms is SECONDARY only |
+| Check whether gaze is closer to the target                   | Accuracy error reported separately                           |
+| Examine ellipses separately for Calibration, 10 min, and 60 min | Complete full-size figures generated separately for all three stages |
+| The master file should include the target, ellipse centre, and spread | `ellipse_master_delay_0.0500s.csv`                           |
+| Choose the shorter candidate when the results are similar    | Select 0.0500 s when the paired bootstrap shows no clear advantage for a longer candidate |
+
+The central objective of the meeting was not to combine accuracy, spread, and 95% coverage into an arbitrary score. Instead, target closeness and cluster spread should be examined separately, followed by application of the shortest-equivalent rule.
+
+Official recommendation: `0.0500 s`.
