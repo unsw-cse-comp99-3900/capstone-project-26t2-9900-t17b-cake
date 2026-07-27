@@ -1,0 +1,12 @@
+{
+  "standard_time_basis": "relative_seconds",
+  "time_origin_epoch_s": 1744428909.497981,
+  "origin_source": "recording_start_time",
+  "transformed_columns": [
+    {
+      "frame": "gaze",
+      "column": "time_s"
+    }
+  ],
+  "source_data_modified": false
+}
