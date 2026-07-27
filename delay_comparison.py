@@ -204,14 +204,14 @@ def bootstrap_arrays(cell_metrics: pd.DataFrame, condition: str | None) -> dict:
     }
 
 
-# 对一次 bootstrap 抽样计算 accuracy 和 spread
+# Calculate accuracy and spread for a single bootstrap sampling
 def bootstrap_statistic(arrays: dict, sampled_subjects: np.ndarray) -> tuple[float, float]:
     accuracy = np.concatenate([arrays[subject][0] for subject in sampled_subjects])
     spread = np.concatenate([arrays[subject][1] for subject in sampled_subjects])
     return float(np.median(accuracy)), float(np.median(spread))
 
 
-# 比较 50、100 和 150 ms，判断更长 delay 是否真的更好
+# Compare 50, 100, and 150 ms to determine if a longer delay is truly better.
 def bootstrap_candidate_comparisons(
     cells_by_delay: dict[float, pd.DataFrame],
     conditions: list[str],
@@ -283,7 +283,7 @@ def bootstrap_candidate_comparisons(
     return pd.DataFrame(rows)
 
 
-# 按 client rule 从 50 ms 开始选择最终 delay
+# Select the final delay starting from 50 ms according to the client rule.
 def select_client_delay(comparisons: pd.DataFrame, condition: str) -> float:
     """Start at 50 ms; move longer only for clear non-conflicting improvement."""
     selected = 0.05
@@ -298,7 +298,7 @@ def select_client_delay(comparisons: pd.DataFrame, condition: str) -> float:
     return selected
 
 
-# 绘制单个 condition 在一个 delay 下的 gaze 分布
+# Plot the gaze distribution of a single condition under a delay.
 def plot_condition_delay(
     module,
     means: pd.DataFrame,
@@ -422,7 +422,7 @@ def plot_metric_curve(
     plt.close(figure)
 
 
-# 单独突出 client 指定的三个 delay
+# Plot the complete sensitivity scan from 0 to 200 ms.
 def plot_client_candidate_metric(
     frame: pd.DataFrame,
     condition: str,
@@ -502,7 +502,7 @@ def plot_client_candidate_metric(
     plt.close(figure)
 
 
-# 使用 OpenET2 的 visual QC 规则筛选绘图点
+# Filtering plotting points using OpenET2's visual QC rules
 def apply_openet_visual_qc(
     recording_means: pd.DataFrame,
     targets: pd.DataFrame,
@@ -551,7 +551,7 @@ def apply_openet_visual_qc(
     return result
 
 
-# 根据 recording-level points 计算 95% observation ellipse
+# Calculate 95% observation ellipse based on recording-level points.
 def openet_observation_ellipse(points: np.ndarray):
     """Return OpenET2's parametric 95% observation ellipse (chi-square 5.991)."""
     points = np.asarray(points, dtype=float)
@@ -572,7 +572,7 @@ def openet_observation_ellipse(points: np.ndarray):
     return points.mean(axis=0), float(width), float(height), angle
 
 
-# 生成 recording-level target comparison 图
+# Generate recording-level target comparison graph
 def plot_recording_target_comparison(
     module,
     means: pd.DataFrame,
@@ -747,7 +747,7 @@ def plot_recording_target_comparison(
     return visual_qc
 
 
-# 把最终推荐和限制写进 Markdown 结果说明
+# Write the final recommendations and limitations into the Markdown results description.
 def write_result_notes(
     output_root: Path,
     selected_delay_s: float,
@@ -805,7 +805,7 @@ def write_result_notes(
     )
 
 
-# 主流程：读取数据、计算指标、选择 delay、生成表格和图片
+# Main workflow: Read data, calculate metrics, select delay, generate tables and images.
 def main() -> None:
     # 1. 读取参数并加载原有分析模块
     args = parse_args()
@@ -818,7 +818,7 @@ def main() -> None:
         if candidate not in delays:
             raise ValueError(f"Required client candidate {candidate:.4f} s is missing")
 
-    # 2. 建立所有输出文件夹
+    # 2. Create all output folders
     output_root = args.output_root.resolve()
     figures = output_root / "figures"
     tables = output_root / "tables"
@@ -844,7 +844,7 @@ def main() -> None:
     ]:
         directory.mkdir(parents=True, exist_ok=True)
 
-    # 3. 读取 target 信息和全部 recording 数据
+    # 3. Read target information and all recording data
     targets = module.target_table()
     assigned, inventory = module.collect_assigned_samples(
         args.data_root.resolve(), targets
@@ -853,7 +853,7 @@ def main() -> None:
     targets.to_csv(tables / "corrected_target_positions.csv", index=False)
     inventory.to_csv(tables / "session_inventory.csv", index=False)
 
-    # 4. 对每个 delay 计算 window means 和汇总指标
+    # 4. Calculate window means and summary metrics for each delay.
     means_by_delay: dict[float, pd.DataFrame] = {}
     cells_by_delay: dict[float, pd.DataFrame] = {}
     aggregate_rows: list[dict[str, object]] = []
@@ -880,7 +880,7 @@ def main() -> None:
     metric_frame.to_csv(tables / "delay_metrics_accuracy_and_spread.csv", index=False)
     all_cells.to_csv(tables / "participant_condition_target_metrics.csv", index=False)
 
-    # 5. 用 paired bootstrap 比较三个 client candidates
+    # 5. Compare three client candidates using paired bootstrap.
     comparisons = bootstrap_candidate_comparisons(
         cells_by_delay,
         conditions,
@@ -893,7 +893,7 @@ def main() -> None:
         condition: select_client_delay(comparisons, condition)
         for condition in conditions
     }
-    # 保存最终 delay、判断规则和分析说明
+    # Save the final delay, judgment rules, and analysis description.
     selection = {
         "selected_delay_s": selected_delay_s,
         "selected_delay_formatted": delay_label(selected_delay_s),
@@ -931,7 +931,7 @@ def main() -> None:
         json.dumps(selection, indent=2), encoding="utf-8"
     )
 
-    # 6. 生成每个 condition 和每个 delay 的完整图
+    # 6. Generate a complete graph for each condition and each delay.
     figure_index: list[dict[str, str]] = []
     for delay_s, means in means_by_delay.items():
         for condition in conditions:
@@ -971,7 +971,7 @@ def main() -> None:
                 }
             )
 
-    # 7. 生成 client 最关心的 50、100 和 150 ms 对比图
+    # 7. Generate a comparison chart showing the 50, 100, and 150 ms latency, which are of most interest to the client.
     for column, label, stem, scope in [
         (
             "balanced_accuracy_deg",
@@ -1018,7 +1018,7 @@ def main() -> None:
             }
         )
 
-    # 8. 生成 0 到 200 ms 的 secondary sensitivity scan
+    # 8. Generate secondary sensitivity scans from 0 to 200 ms.
     for condition in ["ALL"] + conditions:
         condition_selected = (
             selected_delay_s
