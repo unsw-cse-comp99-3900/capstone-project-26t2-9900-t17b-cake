@@ -10,7 +10,7 @@ env/
 !.env.example
 outputs/
 docker-output/
-data/
+/data/
 *.avi
 *.mp4
 *.zip
