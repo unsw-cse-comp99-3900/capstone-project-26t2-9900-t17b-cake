@@ -330,7 +330,7 @@ class PipelineTests(unittest.TestCase):
 class LegacyContinuationTests(unittest.TestCase):
     @property
     def legacy_code_root(self) -> Path:
-        return Path(__file__).resolve().parents[2] / "code"
+        return Path(__file__).resolve().parents[1] / "docker" / "legacy_code"
 
     def test_original_session_folder_contract_is_reused(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
