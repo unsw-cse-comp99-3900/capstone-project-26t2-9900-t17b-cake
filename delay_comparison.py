@@ -1056,7 +1056,7 @@ def main() -> None:
                 }
             )
 
-    # 9. 输出最终选中 delay 对应的数据和 condition 图
+    # 9. Output the final selected delay data and condition graph.
     selected_means = means_by_delay[selected_delay_s]
     selected_means.to_csv(
         tables / f"window_means_selected_{delay_stem(selected_delay_s)}.csv",
@@ -1092,7 +1092,7 @@ def main() -> None:
             }
         )
 
-    # 10. 计算 ellipse QA，并生成 target-level 图
+    # 10. Calculate ellipse QA and generate target-level graphs.
     ellipse_master = module.build_ellipse_master(
         assigned, selected_delay_s, args.coverage
     )
@@ -1130,7 +1130,7 @@ def main() -> None:
                     }
                 )
 
-    # 11. 生成每个 recording 的单独 ellipse 图
+    # 11. Generate a separate ellipse graph for each recording.
     recording_rows = module.plot_per_recording(
         assigned,
         ellipse_master,
@@ -1148,7 +1148,7 @@ def main() -> None:
         row["delay_s"] = selected_delay_s
     figure_index.extend(recording_rows)
 
-    # 12. 生成不同 test ID 的 recording-level comparison
+    # 12. Generate recording-level comparisons for different test IDs.
     comparison_scopes = {
         "Calib & Acc": "S06",
         "Acc 10min": "S07",
@@ -1195,7 +1195,7 @@ def main() -> None:
         index=False,
     )
 
-    # 13. 输出 ellipse coverage、centre error 和 area QA 图
+    # 13. Output ellipse coverage, center error, and area QA graphs.
     qa_specs = [
         (
             "QA",
@@ -1249,7 +1249,7 @@ def main() -> None:
             }
         )
 
-    # 14. 保存 figure index、source manifest 和最终文字结果
+    # 14. Save the figure index, source manifest, and final text results.
     pd.DataFrame(figure_index).to_csv(tables / "figure_index.csv", index=False)
     manifest = {
         "analysis_priority": "client meeting first; user full-grid idea as secondary sensitivity analysis",
@@ -1280,7 +1280,7 @@ def main() -> None:
         metric_frame,
         comparisons,
     )
-    # 15. 保留原来的终端输出
+    # 15. Retain the original terminal output
     print(json.dumps(selection, indent=2))
     print(f"sessions={len(inventory)}")
     print(f"selected_delay={selected_delay_s:.4f}")
