@@ -1656,5 +1656,3 @@ def write_html_report(
 </main></body></html>"""
     report_path.write_text(html, encoding="utf-8")
     return report_path
-
-
