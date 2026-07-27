@@ -16,7 +16,7 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
-# 图表在后台生成，不需要打开图形窗口
+# The chart is generated in the background; there is no need to open the graphics window.
 import matplotlib
 
 matplotlib.use("Agg")
@@ -27,14 +27,14 @@ import numpy as np
 import pandas as pd
 
 
-# Client meeting 指定的三个主要 delay
+# The three main delays specified in the client meeting
 CLIENT_CANDIDATES_S = [0.05, 0.10, 0.15]
 
-# 复用原来的数据读取和基础绘图函数
+# Reuse the original data reading and basic plotting functions
 PRIMARY_MODULE_PATH = Path(__file__).with_name("analyze_real_openet2.py")
 
 
-# 动态读取主分析文件，避免重复写已有功能
+# Dynamically read the main analysis file to avoid repeatedly writing existing functions.
 def load_primary_module():
     spec = importlib.util.spec_from_file_location(
         "openet2_primary_analysis", PRIMARY_MODULE_PATH
@@ -51,7 +51,7 @@ def load_primary_module():
     return module
 
 
-# 保留原来的命令行输入格式
+# Retain the original command-line input format.
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", type=Path, required=True)
@@ -64,7 +64,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# delay 在文件和结果中统一保留四位小数
+# The delay function consistently retains four decimal places in both the file and the results.
 def delay_label(delay_s: float) -> str:
     return f"{delay_s:.4f} s"
 
@@ -73,7 +73,7 @@ def delay_stem(delay_s: float) -> str:
     return f"delay_{delay_s:.4f}s"
 
 
-# 根据图的范围、主题和 delay 生成统一文件名
+# Generate a uniform filename based on the graph's scope, theme, and delay.
 def output_name(
     scope: str,
     topic: str,
@@ -112,7 +112,7 @@ def output_name(
     return "__".join(parts) + ".png"
 
 
-# 在图片底部加入参数和结果说明
+# Add parameters and result descriptions at the bottom of the image.
 def add_figure_footer(figure: plt.Figure, text: str) -> None:
     layout_engine = figure.get_layout_engine()
     if layout_engine is not None and hasattr(layout_engine, "set"):
@@ -128,7 +128,7 @@ def add_figure_footer(figure: plt.Figure, text: str) -> None:
     )
 
 
-# 每个 participant、condition 和 target 先计算一行结果
+# Each participant, condition, and target first calculates one row of results.
 def subject_cell_metrics(means: pd.DataFrame) -> pd.DataFrame:
     """Create one equally weighted row per participant/test-ID/target cell.
 
@@ -163,7 +163,7 @@ def subject_cell_metrics(means: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# 汇总一个 delay 在全部数据或单个 condition 下的结果
+# Summarize the results of a delay across all data or a single condition.
 def aggregate_metric_row(
     cell_metrics: pd.DataFrame,
     means: pd.DataFrame,
@@ -190,7 +190,7 @@ def aggregate_metric_row(
     }
 
 
-# 按 participant 整理 bootstrap 需要的数据
+# Organize the bootstrap data by participant.
 def bootstrap_arrays(cell_metrics: pd.DataFrame, condition: str | None) -> dict:
     work = cell_metrics
     if condition is not None:
