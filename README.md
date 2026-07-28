@@ -1,71 +1,173 @@
-- # OpenET 2 Demo B v3 (2026-07-19)
+# OpenET 2
 
-  This version was rebuilt based on the client meeting, the original OpenET2 v1.5 figures, and the actual Demo B data. All new figures are standalone PNG files, so there is no need to view a montage to understand them. Both the filenames and figure titles specify the condition and the delay to four decimal places.
+OpenET 2 is a modular research toolkit for repeatable remote eye-tracker
+collection, validation, benchmarking, visualisation, and longitudinal comparison.
+Version 1.6 is the final COMP9900 delivery: it preserves the validated v1.5
+implementation, centralises release metadata, and removes duplicate or
+machine-specific material.
 
-  ## Final Conclusion
+The production package is `src/openet2`. It extends the supplied OpenET
+prototype through the compatibility boundary in `legacy.py`; client source
+recordings remain read-only.
 
-  - Primary client comparison: `0.0500 s / 0.1000 s / 0.1500 s`.
-  - Official recommendation: `0.0500 s` (50 ms).
-  - Rationale: Although 100/150 ms slightly reduce spread, they slightly worsen accuracy. The paired bootstrap across 14 participants does not show any clear, non-conflicting improvement from the longer candidates. Following the meeting's shorter-if-equivalent rule, 50 ms was selected.
-  - `0.0000–0.2000 s` is a secondary sensitivity scan, not the primary selection rule.
-  - The OpenET2 example figure uses `0.6000 s` settling, nearest-target + 3.5×MAD visual QC, and a χ²=5.991 ellipse. It serves as a visual/statistical reference and is not a candidate delay for Demo B.
+## Start here
 
-  ## One-Click Launch
+1. Read this file for installation and the supported workflows.
+2. Open `index.html` or `reports/*/report.html` for the bundled evidence.
+3. Review `docs/requirements_traceability.md` for the ten project requirements.
+4. Use `docs/client_demo_guide.md` and `docs/hardware_validation_checklist.md`
+   for the final demonstration and laboratory boundary.
+5. Read `CONTRIBUTING.md` and `docs/github_delivery.md` before changing or
+   publishing the repository.
 
-  Open PowerShell in this folder:
+## Final delivery layout
 
-  ```powershell
-  PowerShell -ExecutionPolicy Bypass -File .\START_DEMO.ps1
-  ```
+```text
+OpenET2_v1.6_Final_2026-07-28/
+├── src/openet2/       Runtime package: collection, import, QC, metrics, reports
+├── tests/             Automated regression and requirement tests
+├── docs/              User, developer, architecture, metrics and final-report guides
+├── examples/          Safe small input and synthetic three-date workflow
+├── reports/           Final client-data and synthetic evidence reports
+├── references/        Client brief, research papers and isolated client-delay evidence
+├── docker/            Legacy compatibility helper used by collection tests
+├── .github/workflows/ GitHub Actions offline Windows validation
+├── CONTRIBUTING.md    Jira branch, commit, pull-request and review policy
+├── Dockerfile         Portable runtime and test image
+├── compose.yaml       Report server, mounted analysis and test services
+└── PACKAGE_CONTENTS.md  Included, excluded and validation inventory
+```
 
-  Then select:
+`outputs/` is deliberately absent from the delivery and ignored by Git. It is
+created only when you run a new local or Docker analysis; final evidence is kept
+under `reports/`.
 
-  1. `Docker`: Rebuild the container, rerun the analysis, and open the UI.
-  2. `Python`: Create `.venv`, install dependencies, rerun the analysis, and open the UI.
-  3. `View`: Open the existing results without recalculating them.
+## Project-requirement coverage
 
-  The HTML file cannot be opened by double-clicking because the page needs to load JSON and modules through a local HTTP server. The launcher automatically opens the correct address: `http://localhost:8765/ui/index.html`.
+The implementation covers the supplied client brief: modular extension of
+OpenET; structured session, device and metadata management; guided collection;
+CSV/TSV/JSON import; automated quality checks; benchmark and repeatability
+metrics; per-session and cohort visualisation; long-term comparison; and user,
+developer and technical documentation. Each requirement is linked to source
+modules and verification in `docs/requirements_traceability.md`.
 
-  If this folder has not yet been placed inside the original project, run:
+## Install
 
-  ```powershell
-  PowerShell -ExecutionPolicy Bypass -File .\INSTALL_TO_ORIGINAL_LOCATION.ps1
-  ```
+```powershell
+# Run from the folder containing this README.
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,video]"
+.\.venv\Scripts\python.exe -c "from importlib.metadata import version; print(version('openet2'))"
+```
 
-  This copies the entire package to:
+The final command should print `1.6.0`. Add the `collection` extra on a
+laboratory computer used for live acquisition:
 
-  `C:\Users\Lenovo\Desktop\demo B\climb_meeting_20260717_final\client_meeting_v3_REDESIGNED_20260719`
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,video,collection]"
+```
 
-  ## How to Use the Folders
+The core offline pipeline requires no eye-tracker SDK. Live Tobii collection
+requires `.[collection]` and the licensed official Tobii Pro SDK.
 
-  - `DemoB_Client_Meeting_Delay_Evidence_REDESIGNED_2026-07-19.pptx`: A six-slide Demo B presentation; accuracy and spread each have a dedicated full-size figure slide.
-  - `DemoB_Client_Meeting_OpenET2_Delay_Recheck_Report_ZH_2026-07-19.docx`: The complete Chinese report.
-  - `CLIENT_MEETING_REQUIREMENTS_ZH.md`: Meeting timestamps and actionable requirements.
-  - `FIGURE_GUIDE_ZH.md`: What each type of figure shows, why it exists, and how to interpret the filenames.
-  - `CODE_WALKTHROUGH_ZH.md`: The code execution chain and explanations of the main functions.
-  - `results/figures/primary_client_candidates/`: Two PRIMARY candidate figures.
-  - `results/figures/extended_scan_by_condition/`: 63 standalone process figures covering 3 conditions × 21 delays.
-  - `results/figures/recording_target_comparison/`: OpenET2-style figures for Calib, 10 min, 60 min, and ALL.
-  - `results/figures/target_condition_selected_delay/`: 27 figures covering 9 targets × 3 conditions.
-  - `results/figures/ellipse_per_recording_selected_delay/`: Empirical ellipse figures for 39 recordings.
-  - `results/tables/figure_index.csv`: Figure-by-figure descriptions for all 149 figures.
-  - `results/tables/selected_delay_client_rule.json`: The final selection and selection rule.
-  - `src/`: Python analysis, UI manifest, server, and one-click launch code.
-  - `ui/`: Local web interface.
-  - `meeting_evidence/`: Meeting transcript files in JSON/SRT format.
+## Quick start
 
-  ## Example Figure Filename - under results file
+### Docker
 
-  `S07__recording-target-comparison__condition-Acc_10min__delay-0.0500s__selected-0.0500s.png`
+Open the bundled reports without installing Python:
 
-  - `S07`: PPT/presentation scope.
-  - `recording-target-comparison`: The subject of the figure.
-  - `condition-Acc_10min`: The 10-minute accuracy test.
-  - `delay-0.0500s`: The delay actually used in this figure.
-  - `selected-0.0500s`: The officially selected delay.
+```powershell
+docker compose up --build -d report
+```
 
-  ## Important Limitations
+Then open <http://localhost:8080/>. See `docs/docker_guide.md` for mounted
+analysis, test execution and external-data configuration.
 
-  - Degree coordinates still use the existing assumed FOV of `60° × 33.75°` because the current data does not include screen width/height or viewing distance.
-  - `0.0500 s` is the project recommendation for this dataset under the meeting's rules. It should not be described as a universal human reaction time.
-  - The OpenET-style χ² ellipse is used only for clear presentation. Client empirical 95% coverage is verified independently using the QA table and ellipse master.
+### Local Python
+
+Run the small example:
+
+```powershell
+openet2 run `
+  --data-root "examples\example_data" `
+  --output-root "outputs\example" `
+  --expected-marker-events 2
+```
+
+Create and analyse the synthetic three-date workflow:
+
+```powershell
+openet2 generate-example --output-root "outputs\synthetic_longitudinal_data"
+openet2 run `
+  --data-root "outputs\synthetic_longitudinal_data" `
+  --output-root "outputs\synthetic_longitudinal_report"
+```
+
+Run the supplied client dataset only when its authorised path is available:
+
+```powershell
+openet2 run `
+  --data-root "<path-to-client-data>" `
+  --output-root "outputs\client_benchmark" `
+  --recover-targets-from-video `
+  --client-delay-evidence "references\client_delay_comparison"
+```
+
+The isolated delay bundle reports approximate assumed-FOV degree scores based on
+a fixed 60.00 x 33.75 degree display grid. They are not measured visual angles or
+pixel distances; the bundled CSV files and `rebuild_figures.py` reproduce all six
+focused delay figures with explicit axis labels.
+
+Create a deterministic no-hardware collection session:
+
+```powershell
+openet2 collect `
+  --legacy-code-root "docker\legacy_code" `
+  --output-root "outputs\collection" `
+  --subject-id "DEMO01" `
+  --device-id "GP3HD" `
+  --test-id "Accuracy" `
+  --test-condition "standard" `
+  --duration-s 30 `
+  --display-width-mm 530 `
+  --display-height-mm 300 `
+  --viewing-distance-mm 600
+```
+
+Dry-run is the default. Add `--live` only on a configured laboratory computer,
+and use `--calibration-confirmed` only after completing live device calibration.
+
+For a real repeated-measurement study, use the fixed-duration, metadata-complete
+protocol in `docs/research_collection_protocol.md`. It adds `--visit-label`,
+display/ambient-light fields, calibration-confidence evidence, and an optional
+4.2-second target presentation that validates nominal post-settling capacity.
+Templates are in `examples/research_session_metadata_template.json` and
+`examples/calibration_result.example.json`.
+
+## Outputs and verification
+
+Every run writes CSV/JSON inventories, quality and benchmark metrics,
+date-level/repeatability summaries, target-level metrics, an HTML report, focused
+figures, session reviews, and a portable run manifest beneath the selected output
+directory. Each standardised session also records its shared relative-time origin
+in `time_alignment.json`; the run manifest records Python and direct-dependency
+versions. See `docs/metrics.md` for definitions.
+
+```powershell
+$env:PYTHONDONTWRITEBYTECODE='1'
+python -m pytest -q -p no:cacheprovider
+```
+
+The full workspace suite processes the authorised client dataset and passes 27
+tests. In a standalone delivery without client data, the read-only client-data
+test skips and all offline tests still pass.
+
+## Evidence boundary
+
+The bundled client-data report contains derived, auditable evidence only; raw
+recordings and AVI files are excluded. The synthetic workflow demonstrates
+software behaviour, not device performance. GP3/Tobii hardware, monitor
+selection, achieved frame rate and physical timing remain subject to the signed
+laboratory checklist. Pygame flip-return times are application-level evidence,
+not measurements of physical pixel onset.
