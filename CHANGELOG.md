@@ -1,5 +1,5 @@
 # Changelog
-## 1.6.0 - 2026-07-28
+## 1.6.0 - 2026-07-27
 
 - Prepare the final COMP9900 delivery from the validated v1.5 implementation.
 - Regenerate final reports with the centralised `1.6.0` runtime and matching
@@ -37,7 +37,7 @@
   `.github/workflows`, and merge the duplicate calibration-result templates.
 
 
-## 1.5.0 - 2026-07-17
+## 1.5.0 - 2026-07-24
 
 - Replace the target-location mean-confidence ellipse with a correctly scaled
   95% observation ellipse based on centroid dispersion.
@@ -73,7 +73,7 @@
   excluded centroids in a separate unfiltered diagnostic figure and CSV fields.
 - Increase automated coverage to 27 passing tests.
 
-## 1.3.0 - 2026-07-17
+## 1.3.0 - 2026-07-03
 
 - Recover the supplied prototype's random nine-point target order from AVI
   screen recordings with midpoint frame alignment and Hough-circle detection.
@@ -88,7 +88,7 @@
   empty-video/empty-marker session as an explicit unrecoverable source failure.
 - Increase automated coverage to 22 passing tests.
 
-## 1.2.0 - 2026-07-17
+## 1.2.0 - 2026-06-25
 
 - Add per-marker `target_metrics.csv/.json` observations.
 - Add participant/visit/target `target_visit_summary.csv/.json` aggregation.
@@ -98,7 +98,7 @@
 - Add explicit unavailable figures when participant, target or display geometry data are absent.
 - Add the target observation table to the HTML report and regression tests for the full workflow.
 
-## 1.1.0 - 2026-07-17
+## 1.1.0 - 2026-06-17
 
 - Record planned marker timing separately from Pygame flip-return timing.
 - Clear each validation target at its planned end and record timing deviation.
@@ -111,7 +111,7 @@
 
 Live GP3/Tobii behaviour remains subject to the laboratory sign-off checklist.
 
-## 1.0.0 - 2026-07-16
+## 1.0.0 - 2026-06-11
 
 - Integrated the six team work packages into the modular `openet2` package.
 - Added structured collection, import, QC, metrics, reports and documentation.
