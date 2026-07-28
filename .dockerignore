@@ -1,0 +1,27 @@
+.git
+.github
+.venv
+venv
+env
+.pytest_cache
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+outputs
+docker-output
+reports
+references
+ci
+docs
+01_session_metadata_management Ruilin Wang
+02_data_import_standardisation He Liu
+03_quality_checks_validation Aria Ou
+04_benchmark_metrics_analysis Yuchen Zhang
+05_visualisation_reporting Huayu Xie
+06_collection_workflow_device_integration Haoqing Gu
+*.zip
+*.avi
+*.mp4
+*.pdf
+*.png
+.DS_Store
