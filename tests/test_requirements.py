@@ -346,6 +346,9 @@ def test_synthetic_example_exercises_longitudinal_and_angular_pipeline() -> None
         assert "04_quality_flags_summary.png" not in report_html
         assert "alt='02_sampling_rate_by_session.png'" not in report_html
         assert "Valid gaze samples by session (%)" in report_html
+        assert 'aria-label="Choose a benchmark figure"' in report_html
+        assert "data-figure-target='figure-panel-0'" in report_html
+        assert "Open image at full size" in report_html
         display_sessions = pd.read_csv(root / "output" / "report_display_session_metrics.csv")
         display_targets = pd.read_csv(root / "output" / "report_display_target_visits.csv")
         assert display_sessions.loc[0, "valid_gaze_samples_pct"] == pytest.approx(
@@ -379,9 +382,22 @@ def test_synthetic_example_exercises_longitudinal_and_angular_pipeline() -> None
         assert "2.8906&deg;" in report_html
         assert "0.5912&deg;" in report_html
         assert "delay_accuracy.png" in report_html
+        assert "aria-label='Choose a primary candidate figure'" in report_html
+        assert "data-figure-target='delay-primary-panel-0'" in report_html
+        assert "aria-label='Choose a selected-delay condition figure'" in report_html
+        assert "data-figure-target='delay-condition-panel-0'" in report_html
+        assert "data-figure-target='delay-condition-panel-2'" in report_html
         assert "does not alter the OpenET2 target settling window" in report_html
         assert "assumed-FOV degree scores" in report_html
         assert "rebuild_figures.py" in report_html
+        rebuild_script = (delay_evidence / "rebuild_figures.py").read_text(encoding="utf-8")
+        assert "_ellipse_bounds" in rebuild_script
+        assert "Full ellipses are shown" in rebuild_script
+        assert "Rectangle(" not in rebuild_script
+        assert "axis.set_xlim(-FOV_X_DEG / 2.0" not in rebuild_script
+        assert "xytext=(0, 8)" in rebuild_script
+        assert "axis.margins(x=0.05, y=0.14)" in rebuild_script
+        assert "value + padding" not in rebuild_script
         assert "Matched long-term comparison" in report_html
         assert "QC-retained target summary by date" in report_html
         delay_rule = json.loads(
