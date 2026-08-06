@@ -25,3 +25,8 @@ docs
 *.pdf
 *.png
 .DS_Store
+
+!references/
+references/*
+!references/client_delay_comparison/
+!references/client_delay_comparison/**

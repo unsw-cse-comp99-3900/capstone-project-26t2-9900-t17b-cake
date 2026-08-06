@@ -73,9 +73,19 @@ def _candidate_figure(
     figure, axis = plt.subplots(figsize=(8.4, 5.1), constrained_layout=True)
     axis.plot(x, y, color="#9bb3c5", linewidth=1.8, zorder=1)
     axis.scatter(x, y, s=125, c=colors, edgecolor="white", linewidth=1.4, zorder=3)
-    padding = max(float(np.ptp(y)) * 0.16, 0.006)
+    axis.margins(x=0.05, y=0.14)
     for delay_ms, value in zip(x, y):
-        axis.text(delay_ms, value + padding, f"{value:.4f}", ha="center", color="#17324d")
+        axis.annotate(
+            f"{value:.4f}",
+            (delay_ms, value),
+            xytext=(0, 8),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            color="#17324d",
+            fontsize=9,
+            zorder=4,
+        )
     axis.set_xticks(x)
     axis.set_xticklabels([f"{int(value)} ms\n({value / 1000:.4f} s)" for value in x])
     axis.set_xlabel("Client-requested delay (ms and s)")
@@ -114,6 +124,33 @@ def _ellipse_parameters(points: np.ndarray) -> tuple[np.ndarray, float, float, f
     return points.mean(axis=0), float(width), float(height), angle
 
 
+def _ellipse_bounds(
+    centre: np.ndarray,
+    width: float,
+    height: float,
+    angle: float,
+) -> tuple[float, float, float, float]:
+    """Return the axis-aligned bounds of a rotated ellipse."""
+
+    angle_radians = np.radians(angle)
+    half_width = width / 2.0
+    half_height = height / 2.0
+    radius_x = np.sqrt(
+        (half_width * np.cos(angle_radians)) ** 2
+        + (half_height * np.sin(angle_radians)) ** 2
+    )
+    radius_y = np.sqrt(
+        (half_width * np.sin(angle_radians)) ** 2
+        + (half_height * np.cos(angle_radians)) ** 2
+    )
+    return (
+        float(centre[0] - radius_x),
+        float(centre[0] + radius_x),
+        float(centre[1] - radius_y),
+        float(centre[1] + radius_y),
+    )
+
+
 def _condition_figure(
     means: pd.DataFrame,
     targets: pd.DataFrame,
@@ -131,8 +168,14 @@ def _condition_figure(
     target_ids = sorted(int(value) for value in targets["target_id"].unique())
     palette = plt.get_cmap("tab10")
     colors = {target_id: palette((target_id - 1) % 10) for target_id in target_ids}
-    figure, axis = plt.subplots(figsize=(9.0, 6.3), constrained_layout=True)
+    figure, axis = plt.subplots(figsize=(9.0, 6.8), constrained_layout=True)
     ellipse_count = 0
+    x_extent_values = [-FOV_X_DEG / 2.0, FOV_X_DEG / 2.0]
+    y_extent_values = [-FOV_Y_DEG / 2.0, FOV_Y_DEG / 2.0]
+    x_extent_values.extend(pd.to_numeric(subset["gaze_x_deg"], errors="coerce").dropna().tolist())
+    y_extent_values.extend(pd.to_numeric(subset["gaze_y_deg"], errors="coerce").dropna().tolist())
+    x_extent_values.extend(pd.to_numeric(targets["target_x_deg"], errors="coerce").dropna().tolist())
+    y_extent_values.extend(pd.to_numeric(targets["target_y_deg"], errors="coerce").dropna().tolist())
     for target_id in target_ids:
         target = targets.loc[targets["target_id"].eq(target_id)].iloc[0]
         group = subset[subset["target_id"].eq(target_id)]
@@ -162,6 +205,9 @@ def _condition_figure(
                     zorder=3,
                 )
             )
+            x_min, x_max, y_min, y_max = _ellipse_bounds(centre, width, height, angle)
+            x_extent_values.extend([x_min, x_max])
+            y_extent_values.extend([y_min, y_max])
             ellipse_count += 1
         axis.scatter(
             [target["target_x_deg"]],
@@ -180,10 +226,15 @@ def _condition_figure(
             fontsize=8,
             color="#17324d",
         )
+
     axis.axhline(0, color="#9aa8b4", linewidth=0.9)
     axis.axvline(0, color="#9aa8b4", linewidth=0.9)
-    axis.set_xlim(-FOV_X_DEG / 2.0, FOV_X_DEG / 2.0)
-    axis.set_ylim(-FOV_Y_DEG / 2.0, FOV_Y_DEG / 2.0)
+    x_span = max(x_extent_values) - min(x_extent_values)
+    y_span = max(y_extent_values) - min(y_extent_values)
+    x_padding = max(0.75, x_span * 0.04)
+    y_padding = max(0.75, y_span * 0.04)
+    axis.set_xlim(min(x_extent_values) - x_padding, max(x_extent_values) + x_padding)
+    axis.set_ylim(min(y_extent_values) - y_padding, max(y_extent_values) + y_padding)
     axis.set_aspect("equal", adjustable="box")
     axis.set_xlabel(f"Horizontal score on assumed {FOV_X_DEG:.2f} deg display-FOV grid (deg)")
     axis.set_ylabel(f"Vertical score on assumed {FOV_Y_DEG:.2f} deg display-FOV grid (deg)")
@@ -196,15 +247,18 @@ def _condition_figure(
             Line2D([0], [0], marker="x", color="#168651", linestyle="none", markersize=8, label="Protocol target"),
             Line2D([0], [0], color="#2878b5", linestyle="--", label="95% observation ellipse"),
         ],
-        loc="lower center",
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.10),
         ncol=3,
         fontsize=8,
         frameon=True,
     )
     axis.text(
         0.01,
-        -0.15,
-        f"{len(subset)} QC-retained observations and {ellipse_count} target ellipses. Assumed-FOV coordinates are approximate, not physical visual angles.",
+        -0.25,
+        f"{len(subset)} QC-retained observations and {ellipse_count} target ellipses. "
+        "Full ellipses are shown; axis limits may extend beyond the assumed display-FOV grid.\n"
+        "Assumed-FOV coordinates are approximate, not physical visual angles.",
         transform=axis.transAxes,
         color="#61758a",
         fontsize=8,
