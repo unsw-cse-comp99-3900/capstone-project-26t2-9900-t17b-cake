@@ -19,7 +19,13 @@ WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY src ./src
 COPY examples ./examples
-COPY docker/legacy_code /code
+COPY docker/legacy_code ./docker/legacy_code
+COPY references/client_delay_comparison ./references/client_delay_comparison
+
+RUN mkdir -p /app/reports/client_data/client_delay_evidence \
+    && cp /app/references/client_delay_comparison/rebuild_figures.py \
+        /app/reports/client_data/client_delay_evidence/rebuild_figures.py \
+    && ln -s /app/docker/legacy_code /code
 
 RUN python -m pip install --upgrade pip \
     && python -m pip install ".[video]" \

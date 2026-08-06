@@ -54,6 +54,16 @@ FIGURE_CAPTIONS = {
     "11_target_layout_and_coverage.png": "QC-filtered target layout in percentages of display width and height; bubble size represents retained samples and colour represents target error.",
 }
 
+FIGURE_TITLES = {
+    "02_sampling_rate_by_session.png": "Sampling rate",
+    "03_valid_rate_by_session.png": "Valid gaze rate",
+    "04_quality_flags_summary.png": "Quality flags",
+    "05_long_term_comparison.png": "Date-level comparison",
+    "09_target_error_confidence_ellipses.png": "Target centroids",
+    "10_omae_vs_target_eccentricity.png": "Error vs eccentricity",
+    "11_target_layout_and_coverage.png": "Target layout and coverage",
+}
+
 
 def _style() -> None:
     sns.set_theme(style="whitegrid")
@@ -796,19 +806,31 @@ def make_figures(
             if errors.notna().any():
                 colorbar = fig.colorbar(scatter, ax=ax, fraction=0.045, pad=0.04)
                 colorbar.set_label(error_label)
-            for _, row in layout_summary.iterrows():
+            for (_, row), bubble_size in zip(layout_summary.iterrows(), sizes):
                 coverage = (
                     f"{row['target_label']}\n{int(row['session_observations'])} sessions / "
                     f"{int(row['retained_samples'])} QC samples"
                 )
+                bubble_radius_points = float(np.sqrt(float(bubble_size) / np.pi))
+                place_above = float(row["target_y"]) >= 75.0
+                label_distance = bubble_radius_points + 4.0
+                vertical_offset = label_distance if place_above else -label_distance
+                vertical_alignment = "bottom" if place_above else "top"
                 ax.annotate(
                     coverage,
                     (float(row["target_x"]), float(row["target_y"])),
-                    xytext=(0, -9),
+                    xytext=(0, vertical_offset),
                     textcoords="offset points",
                     ha="center",
-                    va="top",
+                    va=vertical_alignment,
                     fontsize=7,
+                    bbox={
+                        "boxstyle": "round,pad=0.18",
+                        "facecolor": "white",
+                        "edgecolor": "none",
+                        "alpha": 0.86,
+                    },
+                    zorder=5,
                 )
             ax.add_patch(Rectangle((0, 0), 100, 100, fill=False, edgecolor="#61758a", linewidth=1.2))
             ax.set_xlim(-4, 104)
@@ -1313,16 +1335,34 @@ def _client_delay_section(evidence_dir: Path | None, report_path: Path) -> str:
         )
     if len(rows) != len(candidates):
         return ""
-    figure_html = []
+    figure_assets = []
     for filename, title, caption in _DELAY_EVIDENCE_FIGURES:
         asset = evidence_dir / "figures" / filename
         if asset.is_file():
-            figure_html.append(
-                f"<figure><img src='{escape(_report_relative_path(asset, report_path))}' alt='{escape(title)}'>"
-                f"<figcaption><strong>{escape(title)}</strong> {escape(caption)}</figcaption></figure>"
-            )
-    if len(figure_html) != len(_DELAY_EVIDENCE_FIGURES):
+            figure_assets.append((_report_relative_path(asset, report_path), title, caption))
+    if len(figure_assets) != len(_DELAY_EVIDENCE_FIGURES):
         return ""
+    figure_html = [
+        f"<figure><img src='{escape(path)}' alt='{escape(title)}'>"
+        f"<figcaption><strong>{escape(title)}</strong> {escape(caption)}</figcaption></figure>"
+        for path, title, caption in figure_assets
+    ]
+    primary_delay_buttons = "".join(
+        f"<button type='button' id='delay-primary-tab-{index}' class='figure-tab{' is-active' if index == 0 else ''}' role='tab' aria-selected='{'true' if index == 0 else 'false'}' aria-controls='delay-primary-panel-{index}' data-figure-target='delay-primary-panel-{index}'>{escape(title)}</button>"
+        for index, (_, title, _) in enumerate(figure_assets[:2])
+    )
+    primary_delay_panels = "".join(
+        f"<figure id='delay-primary-panel-{index}' class='figure-panel{' is-active' if index == 0 else ''}' role='tabpanel' aria-labelledby='delay-primary-tab-{index}' data-figure-panel><img src='{escape(path)}' alt='{escape(title)}'><div class='figure-meta'><figcaption><strong>{escape(title)}</strong> {escape(caption)}</figcaption><a href='{escape(path)}' target='_blank' rel='noopener'>Open image at full size</a></div></figure>"
+        for index, (path, title, caption) in enumerate(figure_assets[:2])
+    )
+    condition_delay_buttons = "".join(
+        f"<button type='button' id='delay-condition-tab-{index}' class='figure-tab{' is-active' if index == 0 else ''}' role='tab' aria-selected='{'true' if index == 0 else 'false'}' aria-controls='delay-condition-panel-{index}' data-figure-target='delay-condition-panel-{index}'>{escape(title)}</button>"
+        for index, (_, title, _) in enumerate(figure_assets[2:5])
+    )
+    condition_delay_panels = "".join(
+        f"<figure id='delay-condition-panel-{index}' class='figure-panel{' is-active' if index == 0 else ''}' role='tabpanel' aria-labelledby='delay-condition-tab-{index}' data-figure-panel><img src='{escape(path)}' alt='{escape(title)}'><div class='figure-meta'><figcaption><strong>{escape(title)}</strong> {escape(caption)}</figcaption><a href='{escape(path)}' target='_blank' rel='noopener'>Open image at full size</a></div></figure>"
+        for index, (path, title, caption) in enumerate(figure_assets[2:5])
+    )
     bootstrap_repetitions = _format_value(rule.get("bootstrap_repetitions"), 0)
     return f"""<section id='delay' class='delay-evidence'>
 <div class='heading'><h2>Client-requested delay comparison</h2><p>Independent DemoB client-decision evidence; it does not alter the OpenET2 target settling window.</p></div>
@@ -1330,8 +1370,8 @@ def _client_delay_section(evidence_dir: Path | None, report_path: Path) -> str:
 <p class='note'><strong>Coordinate boundary:</strong> the angular labels in this imported evidence use a fixed {assumed_fov_x:.2f}&deg; &times; {assumed_fov_y:.2f}&deg; display-field-of-view assumption because physical display dimensions and viewing distance were not supplied. Values are approximate, dataset-specific assumed-FOV degree scores; not measured visual angles.</p>
 <div class='result-banner'><div class='result-value'>{int(round(selected_delay * 1000))} ms<small>recommended client delay</small></div><div><h3>Shortest equivalent candidate</h3><p>Longer candidates slightly reduce repeat spread, but do not establish a clear non-conflicting improvement over 50 ms. The recorded decision rule therefore keeps the shortest candidate.</p></div></div>
 <div class='table-wrap delay-table'><table><thead><tr><th>Candidate</th><th>Approx. balanced accuracy (assumed-FOV deg)</th><th>Approx. repeat spread (assumed-FOV deg)</th><th>Valid windows</th><th>Decision</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
-<h3>Primary candidate evidence</h3><div class='figures'>{''.join(figure_html[:2])}</div>
-<h3>Selected-delay views by test condition</h3><div class='figures'>{''.join(figure_html[2:5])}</div>
+<h3>Primary candidate evidence</h3><div class='figure-gallery' data-figure-gallery><div class='figure-tabs' role='tablist' aria-label='Choose a primary candidate figure'>{primary_delay_buttons}</div><div class='figure-stage'>{primary_delay_panels}</div></div>
+<h3>Selected-delay views by test condition</h3><div class='figure-gallery' data-figure-gallery><div class='figure-tabs' role='tablist' aria-label='Choose a selected-delay condition figure'>{condition_delay_buttons}</div><div class='figure-stage'>{condition_delay_panels}</div></div>
 <h3>Post-selection quality assurance</h3><div class='figures'><div>{figure_html[5]}</div><article class='panel decision-panel'><h3>Decision boundary</h3><p>This comparison uses assumed-FOV degree scores, 14 paired participants and {bootstrap_repetitions} bootstrap repetitions. It is separate from the local GP3 normalised-coordinate analysis and from the 0.600 s target-settling exclusion. The 50 ms decision is comparative within this dataset and should not be reported as a physical visual-angle benchmark.</p></article></div>
 </section>"""
 
@@ -1464,9 +1504,13 @@ def write_html_report(
     available_figures = [
         filename for filename in FIGURES if (report_path.parent / "figures" / filename).is_file()
     ]
+    figure_buttons = "".join(
+        f"<button type='button' id='figure-tab-{index}' class='figure-tab{' is-active' if index == 0 else ''}' role='tab' aria-selected='{'true' if index == 0 else 'false'}' aria-controls='figure-panel-{index}' data-figure-target='figure-panel-{index}'>{escape(FIGURE_TITLES[filename])}</button>"
+        for index, filename in enumerate(available_figures)
+    )
     figure_cards = "".join(
-        f"<figure><img src='figures/{escape(filename)}' alt='{escape(FIGURE_CAPTIONS[filename])}'><figcaption>{escape(FIGURE_CAPTIONS[filename])}</figcaption></figure>"
-        for filename in available_figures
+        f"<figure id='figure-panel-{index}' class='figure-panel{' is-active' if index == 0 else ''}' role='tabpanel' aria-labelledby='figure-tab-{index}' data-figure-panel><img src='figures/{escape(filename)}' alt='{escape(FIGURE_CAPTIONS[filename])}'><div class='figure-meta'><figcaption>{escape(FIGURE_CAPTIONS[filename])}</figcaption><a href='figures/{escape(filename)}' target='_blank' rel='noopener'>Open image at full size</a></div></figure>"
+        for index, filename in enumerate(available_figures)
     )
     cards = [
         ("Analysed sessions", _format_value(summary.get("session_count", 0), 0)),
@@ -1639,10 +1683,12 @@ def write_html_report(
     .evidence-status {{ display:grid; grid-template-columns:minmax(260px,.78fr) minmax(320px,1.22fr); gap:20px; margin-top:16px; padding:18px; border:1px solid var(--line); border-radius:13px; box-shadow:0 3px 12px #17324d0d; }} .evidence-status h2 {{ margin:0 0 6px; font-size:21px; }} .evidence-status p {{ margin:0; }} .evidence-status ul {{ margin:0; padding-left:19px; }} .evidence-status li+li {{ margin-top:5px; }} .status-descriptive {{ background:#fff6e8; border-color:#efc77d; color:#6c4813; }} .status-synthetic {{ background:#edf2ff; border-color:#9ab4ed; color:#273d79; }} .status-conditional {{ background:#fff8e6; border-color:#e7cf87; color:#624e19; }} .status-ready {{ background:#edf8f0; border-color:#a4d3ae; color:#245b32; }}
     .result-banner {{ display:grid; grid-template-columns:minmax(145px,.35fr) 1fr; gap:18px; align-items:center; margin:16px 0; padding:18px; background:#edf7ef; border:1px solid #bcdcc4; border-radius:13px; }} .result-value {{ color:#126c35; font-size:31px; font-weight:750; line-height:1; }} .result-value small {{ display:block; margin-top:7px; color:#487058; font-size:11px; font-weight:650; text-transform:uppercase; letter-spacing:.06em; }} .result-banner p {{ margin:0; color:#31523e; }} .selected-row td {{ background:#f1f9f3; }} .pill {{ display:inline-block; padding:2px 7px; color:#126c35; background:#dff2e3; border-radius:999px; font-size:11px; font-weight:750; }} .delay-evidence h3 {{ margin-top:19px; }} .delay-evidence .decision-panel {{ align-self:stretch; }}
     .figures {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(390px,1fr)); gap:17px; }} figure {{ margin:0; padding:11px; }} figure img {{ display:block; width:100%; border-radius:7px; }} figcaption {{ padding:8px 3px 1px; color:var(--muted); font-size:12.5px; }}
+    .figure-tabs {{ display:none; flex-wrap:wrap; gap:9px; margin-bottom:14px; }} .figure-gallery.is-interactive .figure-tabs {{ display:flex; }} .figure-tab {{ padding:9px 14px; color:var(--ink); background:#fff; border:1px solid #b9c9d8; border-radius:999px; cursor:pointer; font:inherit; font-size:13px; font-weight:700; transition:background .14s ease,border-color .14s ease,color .14s ease; }} .figure-tab:hover {{ border-color:var(--accent); }} .figure-tab:focus-visible {{ outline:3px solid #8bc5eb; outline-offset:2px; }} .figure-tab.is-active {{ color:#fff; background:var(--accent); border-color:var(--accent); }}
+    .figure-stage {{ display:grid; gap:17px; }} .figure-panel {{ margin:0; padding:16px; }} .figure-gallery.is-interactive .figure-panel:not(.is-active) {{ display:none; }} .figure-panel img {{ display:block; width:100%; max-height:76vh; object-fit:contain; background:#f8fafc; border-radius:7px; }} .figure-meta {{ display:flex; justify-content:space-between; align-items:flex-start; gap:18px; padding:11px 3px 1px; }} .figure-meta figcaption {{ padding:0; color:var(--muted); font-size:14px; }} .figure-meta a {{ flex:none; color:#226592; font-size:13px; font-weight:700; white-space:nowrap; }}
     .table-wrap {{ overflow:auto; }} table {{ width:100%; min-width:840px; border-collapse:collapse; font-size:13px; }} th,td {{ padding:9px 11px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; white-space:nowrap; }} th {{ color:var(--ink); background:#edf4fa; font-size:12px; position:sticky; top:0; }} tr:last-child td {{ border-bottom:0; }} td:last-child {{ min-width:170px; white-space:normal; }} .empty {{ padding:17px; color:var(--muted); background:#fff; border:1px solid var(--line); border-radius:13px; }}
     .downloads {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(245px,1fr)); gap:13px; }} .download {{ min-height:118px; padding:16px; color:inherit; text-decoration:none; transition:transform .14s ease,border-color .14s ease; }} .download:hover {{ color:inherit; border-color:#7cb7dc; transform:translateY(-2px); }} .download strong,.download span {{ display:block; }} .download strong {{ margin-top:5px; color:var(--ink); }} .download span:last-child {{ margin-top:5px; color:var(--muted); font-size:12.5px; }} .format {{ color:#226592; font-size:10px; font-weight:750; letter-spacing:.08em; }}
     .boundary {{ padding:17px; }} .boundary ul {{ margin:0; padding-left:21px; }} .boundary li+li {{ margin-top:7px; }} footer {{ margin-top:34px; padding-top:17px; color:var(--muted); font-size:12.5px; border-top:1px solid var(--line); }} code {{ padding:1px 4px; background:#dcecf8; border-radius:4px; }}
-    @media(max-width:680px) {{ .heading {{ display:block; }} .heading p {{ margin-top:5px; }} .figures {{ grid-template-columns:1fr; }} .wrap,main {{ width:94vw; }} }}
+    @media(max-width:680px) {{ .heading {{ display:block; }} .heading p {{ margin-top:5px; }} .figures {{ grid-template-columns:1fr; }} .figure-meta {{ display:block; }} .figure-meta a {{ display:inline-block; margin-top:8px; }} .figure-panel {{ padding:9px; }} .wrap,main {{ width:94vw; }} }}
   </style>
 </head>
 <body>
@@ -1652,7 +1698,7 @@ def write_html_report(
 {evidence_status_html}
 <div class="panels"><article class="panel"><h3>Report display units</h3><p>Sampling is in Hz; rates use percent rather than raw 0–1 proportions.</p><ul><li><code>valid_gaze_samples_pct = valid_rate × 100</code></li><li><code>data_loss_pct = data_loss_rate × 100</code></li><li>{escape(target_note)}</li></ul></article><article class="panel"><h3>Traceability</h3><p>Raw analysis CSV/JSON files remain unchanged. The report adds explicitly named display tables solely to match its figures and tables.</p><ul><li>Degree fields stay blank without physical geometry.</li><li>Thresholds flag review items; they do not delete source samples.</li></ul></article></div></section>
 {delay_section}
-<section id="figures"><div class="heading"><h2>Benchmark visualisations</h2><p>Only figures with interpretable axes are retained in the final report.</p></div><div class="figures">{figure_cards}</div></section>
+<section id="figures"><div class="heading"><h2>Benchmark visualisations</h2></div><div class="figure-gallery" data-figure-gallery><div class="figure-tabs" role="tablist" aria-label="Choose a benchmark figure">{figure_buttons}</div><div class="figure-stage">{figure_cards}</div></div></section>
 <section id="long-term"><div class="heading"><h2>{escape(long_term_title)}</h2><p>{escape(long_term_description)}</p></div>{_html_table(long_term_display, long_columns, long_labels, long_decimals)}</section>
 <section id="repeatability"><div class="heading"><h2>Within-participant repeatability</h2><p>Shown only for genuinely repeated participant, device and protocol groups.</p></div>{_html_table(repeatability_display, repeat_columns, repeat_labels, rate_decimals)}</section>
 <section id="criteria"><div class="heading"><h2>Reference-paper criteria and applicability</h2><p>Reference checks are applied only when the recorded measurements and units support them.</p></div>{_html_table(paper_criteria, ["reference_item", "paper_criterion", "current_application", "status"])}</section>
@@ -1661,6 +1707,44 @@ def write_html_report(
 <section id="downloads"><div class="heading"><h2>Auditable data downloads</h2><p>Presentation-layer tables and unmodified raw analysis files are both available.</p></div><div class="downloads">{download_html}</div></section>
 <section id="boundaries"><div class="heading"><h2>Interpretation boundaries</h2><p>These statements preserve the limits of the supplied measurements.</p></div><div class="boundary"><ul><li>Percent display fields are deterministic conversions, not recalibrated measurements.</li><li>Normalised screen-coordinate percentages are display-relative quantities, not visual degrees or pixel distances.</li><li>Visual-angle conclusions require recorded display dimensions and viewing distance; assumed-FOV delay scores are explicitly labelled approximate.</li><li>Date-level changes are descriptive unless participants, devices and protocols are genuinely matched.</li><li>QC exclusions are recorded in exports; this report does not silently impute or delete source values.</li></ul></div></section>
 <footer>OpenET 2 final report · Display-unit definitions: <a href="report_display_units.json">report_display_units.json</a>.</footer>
-</main></body></html>"""
+</main>
+<script>
+  document.querySelectorAll('[data-figure-gallery]').forEach((gallery) => {{
+    const buttons = [...gallery.querySelectorAll('[data-figure-target]')];
+    const panels = [...gallery.querySelectorAll('[data-figure-panel]')];
+    if (!buttons.length || !panels.length) return;
+
+    const activate = (selectedButton) => {{
+      const targetId = selectedButton.dataset.figureTarget;
+      buttons.forEach((button) => {{
+        const active = button === selectedButton;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-selected', String(active));
+        button.tabIndex = active ? 0 : -1;
+      }});
+      panels.forEach((panel) => {{
+        const active = panel.id === targetId;
+        panel.classList.toggle('is-active', active);
+        panel.hidden = !active;
+      }});
+    }};
+
+    gallery.classList.add('is-interactive');
+    buttons.forEach((button, index) => {{
+      button.addEventListener('click', () => activate(button));
+      button.addEventListener('keydown', (event) => {{
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        let nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : index;
+        if (event.key === 'ArrowLeft') nextIndex = (index - 1 + buttons.length) % buttons.length;
+        if (event.key === 'ArrowRight') nextIndex = (index + 1) % buttons.length;
+        buttons[nextIndex].focus();
+        activate(buttons[nextIndex]);
+      }});
+    }});
+    activate(buttons[0]);
+  }});
+</script>
+</body></html>"""
     report_path.write_text(html, encoding="utf-8")
     return report_path
