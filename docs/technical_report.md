@@ -40,7 +40,7 @@ calculates coordinate and optional angular metrics, generates individual and
 cohort figures, and writes long-term plus participant-matched repeatability
 summaries. It never modifies source recordings.
 
-Version 1.4 also recovers the supplied prototype's lost random target identity
+The offline pipeline also recovers the supplied prototype's lost random target identity
 from its AVI screen recordings. Each marker midpoint is mapped to a timestamped
 frame, the circle is detected near the documented nine protocol positions, and
 coordinates are accepted only if all 27 intervals resolve and each target occurs
@@ -67,7 +67,7 @@ comparable with the GP3 export schema.
 
 ## Validation evidence
 
-Thirty automated tests cover CSV/TSV/JSON imports, known GP3 coordinate
+Automated tests cover CSV/TSV/JSON imports, known GP3 coordinate
 semantics, recorded and inferred shared epoch origins, client folder compatibility,
 rich/conflicting/unreadable metadata, complete dry-run outputs, gap/loss detection,
 target and angular metrics, participant-aware repeatability, failure isolation,
@@ -92,7 +92,7 @@ The client workflow lacks physical display size and viewing distance, so it uses
 explicitly labelled normalised screen fractions and cross-sectional date facets.
 The known GP3 `FPOGX`/`FPOGY` fields identify all 40 sessions as normalised
 coordinates; out-of-bounds values remain quality evidence rather than changing
-the unit of an entire session. The final target-location view plots 280 of 348
+the unit of an entire session. The target-location view plots 280 of 348
 session/target observations after auditable QC: 13 lack five in-screen samples,
 52 are closest to another protocol target, and 3 are robust centroid outliers.
 Its target-wise 95% observation ellipses use covariance of retained centroids
@@ -144,9 +144,9 @@ examples, installation/user/developer documentation, and real-data
 demonstration. Live-device sign-off remains an explicitly documented external
 verification step rather than an untested software claim.
 
-## Final evidence controls
+## Evidence controls
 
-The final package adds an evidence-status panel and input file fingerprints so a
+The reporting workflow adds an evidence-status panel and input file fingerprints so a
 reader can distinguish descriptive client evidence, synthetic pipeline
 validation, and future matched comparative data. It also exposes an optional
 research collection protocol with fixed target presentation, visit labels, and

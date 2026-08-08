@@ -70,7 +70,7 @@ measured visual angles.
 
 Figure 09 is the paper-style QC view. Its dashed curves are 95% observation
 ellipses, not confidence intervals for the mean, so a small number of valid
-points may fall outside. The final report keeps the presentation view focused;
+points may fall outside. The HTML report keeps the presentation view focused;
 use `target_visit_summary.csv/.json` and its `paper_qc_*` / `paper_plot_*` fields
 to audit every centroid and exclusion. Figures 09-11 and the compact HTML target
 summary all use the same `paper_plot_status=included` observations.

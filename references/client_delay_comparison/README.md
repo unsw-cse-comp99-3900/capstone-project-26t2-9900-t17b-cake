@@ -1,6 +1,6 @@
 # Client-requested delay comparison evidence
 
-This focused bundle is derived from the supplied `DemoB_FinalEdition` analysis and remains separate from the OpenET2 session pipeline.
+This focused bundle contains the client-requested delay analysis and remains separate from the OpenET 2 session pipeline.
 
 ## Decision
 

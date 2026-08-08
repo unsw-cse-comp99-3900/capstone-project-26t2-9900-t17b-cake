@@ -1,11 +1,10 @@
 # Docker guide
 
-The `OpenET2_v1.6_Final_2026-07-28` folder is a self-contained Docker delivery.
-It includes runtime source, final reports, examples, tests, `Dockerfile` and
-`compose.yaml`. Docker Desktop (Windows/macOS) or Docker Engine with Compose
-(Linux) is the only host prerequisite.
+The repository includes the runtime source, bundled reports, examples, tests,
+`Dockerfile`, and `compose.yaml`. Docker Desktop on Windows or macOS, or Docker
+Engine with Compose on Linux, is the only host prerequisite.
 
-## Open final reports
+## Open bundled reports
 
 Run this command from the folder containing `compose.yaml`:
 
@@ -37,7 +36,7 @@ With the report service running, open
 
 Copy `.env.example` to `.env`, then set `OPENET2_DATA_ROOT` to the authorised
 host path and optionally change `OPENET2_OUTPUT_ROOT`. The default output is
-`./outputs`, keeping generated files outside the final evidence folders.
+`./outputs`, keeping generated files outside the bundled evidence folders.
 
 ```console
 docker compose --profile analysis run --rm analysis run --data-root /data --output-root /output --recover-targets-from-video
@@ -54,7 +53,7 @@ docker compose --profile test run --rm test
 ```
 
 The containerised suite passes all offline tests. The authorised client dataset
-is deliberately absent from this final package, so its availability test skips.
+is not included in the repository, so its availability test skips.
 
 ## Boundary
 
