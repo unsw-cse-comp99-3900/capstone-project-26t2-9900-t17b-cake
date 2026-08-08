@@ -42,11 +42,11 @@ Malformed sessions create failure rows while other sessions continue. Raw data
 must never be rewritten. Programming errors should be fixed rather than hidden;
 the pipeline catches expected data/plot/runtime errors at the session boundary.
 
-## Release checklist
+## Change verification checklist
 
-1. Update version in `pyproject.toml`, `openet2.__init__`, collection metadata,
-   manifest, and README.
-2. Run unit/integration tests and the supplied-data regression.
-3. Run the included example and inspect `report.html` plus session review.
-4. Execute the hardware checklist for each live device/SDK version.
-5. Confirm documentation and requirements traceability reflect implemented code.
+1. Run unit, integration, and requirement tests.
+2. Run the included examples and inspect the generated HTML reports.
+3. Verify metric units, evidence labels, and requirements traceability.
+4. Execute the hardware checklist for each live device and SDK configuration.
+5. Confirm source data remains read-only and no private raw data is included.
+6. Update user and developer documentation when behaviour changes.

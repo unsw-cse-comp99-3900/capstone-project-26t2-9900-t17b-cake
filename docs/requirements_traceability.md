@@ -11,7 +11,7 @@
 | 7. Benchmark metrics | duration/rate/loss/precision/stability/systematic/random/accuracy/angular/repeatability; configurable 0.6 s target settling with exclusion evidence; paper-criteria applicability table | Marker, settling-window, angular, unit-aware calibration, and repeatability tests |
 | 8. Visualisation | up to seven focused cohort figures: sampling rate, valid-sample rate, non-empty QC flags, date-level comparison, QC-filtered target locations, QC-filtered error/eccentricity, and QC-filtered target layout/coverage; four-panel per-session review; HTML report. Unfiltered target diagnostics remain in auditable CSV/JSON fields rather than presentation charts. | Pipeline integration test, target-level/QC/ellipse regression tests, visual inspection, and generated artifacts |
 | 9. Long-term comparison | date/device/test/condition cohort summary plus separately identified participant-matched repeatability | Participant separation test and three-date synthetic end-to-end dataset |
-| 10. Documentation/usability | CLI, example datasets/workflows, README, user/developer/metrics/hardware/GitHub guides, technical report | Example pipelines, Windows CI, and documentation review |
+| 10. Documentation/usability | CLI, example datasets/workflows, README, user/developer/metrics/Docker/hardware/research guides, technical report | Example pipelines, Windows CI, and documentation review |
 
 ## External verification boundary
 
@@ -20,11 +20,11 @@ automatically tested. Physical GP3/Tobii calibration, SDK compatibility, monitor
 selection, timing latency, and achieved frame rate require the client/lab
 devices and are verified using `hardware_validation_checklist.md`.
 
-## Final evidence upgrades
+## Research-readiness controls
 
-The final v1.6 quality pass adds a structured optional research protocol rather
-than altering the supplied client data: visit labels, display/environment fields,
-calibration sample-confidence fields, target-duration capacity validation,
+The optional research protocol adds visit labels, display and environment
+fields, calibration-confidence evidence, target-duration capacity validation,
 application-level timing summaries, report evidence-status labels, and portable
-SHA-256 input provenance. These additions strengthen requirements 2-4, 7, 9,
-and 10 while keeping hardware validation an external acceptance activity.
+SHA-256 input provenance. These controls strengthen requirements 2-4, 7, 9,
+and 10 without altering supplied source data or treating hardware validation as
+an automated software result.

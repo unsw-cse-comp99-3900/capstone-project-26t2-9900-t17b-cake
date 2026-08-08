@@ -1,92 +1,101 @@
 # OpenET 2
 
-OpenET 2 is a modular research toolkit for repeatable remote eye-tracker
-collection, validation, benchmarking, visualisation, and longitudinal comparison.
-Version 1.6 is the final COMP9900 delivery: it preserves the validated v1.5
-implementation, centralises release metadata, and removes duplicate or
-machine-specific material.
+OpenET 2 is a modular Python toolkit for collecting, organising, validating,
+benchmarking, visualising, and comparing remote eye-tracking data over time.
+It extends the supplied OpenET framework with a repeatable research workflow
+while keeping source recordings read-only.
 
-The production package is `src/openet2`. It extends the supplied OpenET
-prototype through the compatibility boundary in `legacy.py`; client source
-recordings remain read-only.
+The system is designed for researchers who need consistent session metadata,
+multi-format import, automated quality checks, reproducible metrics, static HTML
+reports, and repeated-measurement comparisons across devices and study visits.
 
-## Start here
+## Project capabilities
 
-1. Read this file for installation and the supported workflows.
-2. Open `index.html` or `reports/*/report.html` for the bundled evidence.
-3. Review `docs/requirements_traceability.md` for the ten project requirements.
-4. Use `docs/client_demo_guide.md` and `docs/hardware_validation_checklist.md`
-   for the final demonstration and laboratory boundary.
-5. Read `CONTRIBUTING.md` and `docs/github_delivery.md` before changing or
-   publishing the repository.
+OpenET 2 implements the ten capabilities defined in the project brief:
 
-## Final delivery layout
+1. A maintainable extension of the existing OpenET framework.
+2. Structured session folders and session identifiers.
+3. A repeatable calibration, validation, recording, and completion workflow.
+4. Device, participant, display, calibration, and environment metadata.
+5. Extensible CSV, TSV, and JSON import.
+6. Automated checks for missing, invalid, duplicated, irregular, or incomplete data.
+7. Sampling, completeness, precision, stability, calibration, and repeatability metrics.
+8. Recording-level and cohort-level visualisations in portable HTML reports.
+9. Long-term and participant-matched comparison across repeated sessions.
+10. Installation, user, developer, example, and technical documentation.
+
+Implementation and verification links are listed in
+`docs/requirements_traceability.md`.
+
+## Repository layout
 
 ```text
-OpenET2_v1.6_Final_2026-07-28/
-├── src/openet2/       Runtime package: collection, import, QC, metrics, reports
-├── tests/             Automated regression and requirement tests
-├── docs/              User, developer, architecture, metrics and final-report guides
-├── examples/          Safe small input and synthetic three-date workflow
-├── reports/           Final client-data and synthetic evidence reports
-├── references/        Client brief, research papers and isolated client-delay evidence
-├── docker/            Legacy compatibility helper used by collection tests
-├── .github/workflows/ GitHub Actions offline Windows validation
-├── CONTRIBUTING.md    Jira branch, commit, pull-request and review policy
-├── Dockerfile         Portable runtime and test image
-├── compose.yaml       Report server, mounted analysis and test services
-└── PACKAGE_CONTENTS.md  Included, excluded and validation inventory
+.
+|-- src/openet2/       Runtime package
+|-- tests/             Unit, integration, and requirement tests
+|-- docs/              User, developer, research, and technical documentation
+|-- examples/          Safe example inputs and synthetic workflows
+|-- reports/           Bundled derived HTML reports and figures
+|-- references/        Project references and reproducible delay evidence
+|-- docker/            Compatibility support for collection tests
+|-- .github/workflows/ Offline continuous integration
+|-- Dockerfile         Portable runtime and test image
+|-- compose.yaml       Report, analysis, and test services
+`-- pyproject.toml     Package and dependency configuration
 ```
 
-`outputs/` is deliberately absent from the delivery and ignored by Git. It is
-created only when you run a new local or Docker analysis; final evidence is kept
-under `reports/`.
+Generated outputs belong under the ignored `outputs/` directory. Bundled report
+artifacts remain under `reports/`. Raw client gaze files and recordings are not
+included in the repository.
 
-## Project-requirement coverage
+## Documentation
 
-The implementation covers the supplied client brief: modular extension of
-OpenET; structured session, device and metadata management; guided collection;
-CSV/TSV/JSON import; automated quality checks; benchmark and repeatability
-metrics; per-session and cohort visualisation; long-term comparison; and user,
-developer and technical documentation. Each requirement is linked to source
-modules and verification in `docs/requirements_traceability.md`.
+- `docs/user_guide.md`: collection, analysis, outputs, and troubleshooting.
+- `docs/docker_guide.md`: report hosting, analysis, and tests with Docker.
+- `docs/research_collection_protocol.md`: metadata-complete repeated collection.
+- `docs/hardware_validation_checklist.md`: laboratory acceptance checks.
+- `docs/developer_guide.md`: extension rules and verification expectations.
+- `docs/architecture.md`: package boundaries and standard data tables.
+- `docs/metrics.md`: quality checks, metrics, units, and interpretation limits.
+- `docs/requirements_traceability.md`: project requirements mapped to evidence.
+- `docs/technical_report.md`: design decisions, validation, and limitations.
 
 ## Install
 
+Python 3.11 is recommended for the full offline and video workflow.
+
 ```powershell
-# Run from the folder containing this README.
 py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -e ".[dev,video]"
-.\.venv\Scripts\python.exe -c "from importlib.metadata import version; print(version('openet2'))"
+.\.venv\Scripts\python.exe -c "import openet2; print('OpenET 2 is ready')"
 ```
 
-The final command should print `1.6.0`. Add the `collection` extra on a
-laboratory computer used for live acquisition:
+On a laboratory computer used for live acquisition, install the collection
+dependencies as well:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -e ".[dev,video,collection]"
 ```
 
-The core offline pipeline requires no eye-tracker SDK. Live Tobii collection
-requires `.[collection]` and the licensed official Tobii Pro SDK.
+The offline pipeline does not require an eye-tracker SDK. Live Tobii collection
+requires the licensed official Tobii Pro SDK and supported hardware.
 
 ## Quick start
 
-### Docker
-
-Open the bundled reports without installing Python:
+### Open the bundled reports with Docker
 
 ```powershell
 docker compose up --build -d report
 ```
 
-Then open <http://localhost:8080/>. See `docs/docker_guide.md` for mounted
-analysis, test execution and external-data configuration.
+Open <http://localhost:8080/> and stop the service with:
 
-### Local Python
+```powershell
+docker compose down
+```
 
-Run the small example:
+### Analyse the small example
 
 ```powershell
 openet2 run `
@@ -95,7 +104,7 @@ openet2 run `
   --expected-marker-events 2
 ```
 
-Create and analyse the synthetic three-date workflow:
+### Generate a repeated synthetic workflow
 
 ```powershell
 openet2 generate-example --output-root "outputs\synthetic_longitudinal_data"
@@ -104,22 +113,25 @@ openet2 run `
   --output-root "outputs\synthetic_longitudinal_report"
 ```
 
-Run the supplied client dataset only when its authorised path is available:
+Synthetic data verifies software behaviour and participant-matched comparison.
+It is not evidence of physical eye-tracker performance.
+
+### Analyse an authorised dataset
 
 ```powershell
 openet2 run `
-  --data-root "<path-to-client-data>" `
-  --output-root "outputs\client_benchmark" `
+  --data-root "<path-to-authorised-data>" `
+  --output-root "outputs\benchmark" `
   --recover-targets-from-video `
   --client-delay-evidence "references\client_delay_comparison"
 ```
 
-The isolated delay bundle reports approximate assumed-FOV degree scores based on
-a fixed 60.00 x 33.75 degree display grid. They are not measured visual angles or
-pixel distances; the bundled CSV files and `rebuild_figures.py` reproduce all six
-focused delay figures with explicit axis labels.
+The input data remains read-only. Video target recovery is accepted only when
+the complete protocol passes validation. Delay evidence remains separate from
+session metrics and uses explicitly labelled assumed display-field-of-view
+scores rather than measured physical visual angles.
 
-Create a deterministic no-hardware collection session:
+### Rehearse collection without hardware
 
 ```powershell
 openet2 collect `
@@ -135,39 +147,42 @@ openet2 collect `
   --viewing-distance-mm 600
 ```
 
-Dry-run is the default. Add `--live` only on a configured laboratory computer,
-and use `--calibration-confirmed` only after completing live device calibration.
+Collection is a dry run unless `--live` is supplied. Use
+`--calibration-confirmed` only after real device calibration has completed.
 
-For a real repeated-measurement study, use the fixed-duration, metadata-complete
-protocol in `docs/research_collection_protocol.md`. It adds `--visit-label`,
-display/ambient-light fields, calibration-confidence evidence, and an optional
-4.2-second target presentation that validates nominal post-settling capacity.
-Templates are in `examples/research_session_metadata_template.json` and
-`examples/calibration_result.example.json`.
+## Outputs
 
-## Outputs and verification
+An analysis run writes standardised tables, quality reports, benchmark metrics,
+target-level summaries, repeated-measurement summaries, figures, session reviews,
+an HTML report, an input provenance inventory, and a run manifest beneath the
+selected output directory.
 
-Every run writes CSV/JSON inventories, quality and benchmark metrics,
-date-level/repeatability summaries, target-level metrics, an HTML report, focused
-figures, session reviews, and a portable run manifest beneath the selected output
-directory. Each standardised session also records its shared relative-time origin
-in `time_alignment.json`; the run manifest records Python and direct-dependency
-versions. See `docs/metrics.md` for definitions.
+Important interpretation boundaries:
+
+- Coordinate-unit results must not be described as degrees or pixels.
+- Visual-angle metrics require measured display geometry and viewing distance.
+- Cross-sectional dates do not establish device drift when participants differ.
+- Synthetic outputs demonstrate the pipeline, not hardware performance.
+- Application timing does not measure physical pixel-onset latency.
+
+See `docs/metrics.md` and the evidence-status panel in each report before using
+results in a study conclusion.
+
+## Verification
+
+Run the offline test suite locally:
 
 ```powershell
 $env:PYTHONDONTWRITEBYTECODE='1'
 python -m pytest -q -p no:cacheprovider
 ```
 
-The full workspace suite processes the authorised client dataset and passes 27
-tests. In a standalone delivery without client data, the read-only client-data
-test skips and all offline tests still pass.
+Or run it in the project container:
 
-## Evidence boundary
+```powershell
+docker compose --profile test run --rm test
+```
 
-The bundled client-data report contains derived, auditable evidence only; raw
-recordings and AVI files are excluded. The synthetic workflow demonstrates
-software behaviour, not device performance. GP3/Tobii hardware, monitor
-selection, achieved frame rate and physical timing remain subject to the signed
-laboratory checklist. Pygame flip-return times are application-level evidence,
-not measurements of physical pixel onset.
+Live GP3 and Tobii behaviour, SDK compatibility, display selection, achieved
+frame rate, and physical timing require laboratory validation with
+`docs/hardware_validation_checklist.md`.
