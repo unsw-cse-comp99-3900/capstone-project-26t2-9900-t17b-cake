@@ -99,7 +99,7 @@ without dividing it by the number of observations and
 observations. This is a distribution ellipse, not a confidence interval for
 the mean. A 95% ellipse is expected to leave about 5% of valid observations
 outside, so enlarging it to contain every point would mislabel the statistic.
-The final HTML report omits the unfiltered centroid diagnostic because it is an
+The HTML report omits the unfiltered centroid diagnostic because it is an
 audit view rather than a presentation result. All centroid statuses, original
 values and QC thresholds remain in `target_visit_summary.csv/.json`.
 
@@ -182,7 +182,7 @@ Different participant cohorts must not be interpreted as causal device drift.
 The separate target-analysis setting defaults to a 0.6-second settling window;
 it is not a quality pass/fail threshold.
 
-## Final-report chart units
+## Report chart units
 
 The final HTML report contains only figures with interpretable axes: sampling
 rate in Hz, valid gaze samples in percent, non-empty QC frequency as affected-

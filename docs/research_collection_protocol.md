@@ -78,4 +78,4 @@ preconditions are not met.
   portable SHA-256 fingerprints.
 - Review `marker_timing_summary.json` as application-level timing evidence.
 - Store consent, re-identification keys, raw eye videos, and device exports
-  outside the delivery package according to the approved data-governance plan.
+  outside the repository according to the approved data-governance plan.
